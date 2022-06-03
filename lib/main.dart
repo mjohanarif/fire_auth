@@ -1,115 +1,373 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (!kIsWeb) {
+    await Firebase.initializeApp();
+  } else {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: 'AIzaSyAP42iiGg0sZoE6dDuUgeXW0aHoAVWhNBg',
+        appId: 'fireauth-4865c.firebaseapp.com',
+        messagingSenderId: '355468251515',
+        projectId: 'fireauth-4865c',
+        authDomain: 'fireauth-4865c.firebaseapp.com',
+        storageBucket: 'fireauth-4865c.appspot.com',
+      ),
+    );
+  }
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+      title: 'Firebase Example App',
+      theme: ThemeData(primarySwatch: Colors.amber),
+      home: Scaffold(
+        body: LayoutBuilder(
+          builder: (context, constraines) {
+            return Row(
+              children: [
+                Visibility(
+                  visible: constraines.maxWidth >= 1200,
+                  child: Expanded(
+                    child: Container(
+                      height: double.infinity,
+                      color: Theme.of(context).colorScheme.primary,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Firebase Auth Desktop',
+                              style: Theme.of(context).textTheme.headline4,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: constraines.maxWidth >= 1200
+                      ? constraines.maxWidth / 2
+                      : constraines.maxWidth,
+                  child: StreamBuilder<User?>(
+                    stream: FirebaseAuth.instance.authStateChanges(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return HomePage(
+                          auth: FirebaseAuth.instance,
+                        );
+                      }
+                      return const LoginPage();
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _LoginPageState extends State<LoginPage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
 
-  void _incrementCounter() {
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  String error = '';
+  String verificationId = '';
+  bool isLoading = false;
+
+  void setIsLoading() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      isLoading = !isLoading;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+    return Form(
+      key: formKey,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+          children: [
+            Visibility(
+              visible: error.isNotEmpty,
+              child: MaterialBanner(
+                backgroundColor: Theme.of(context).errorColor,
+                content: Text(error),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        error = '';
+                      });
+                    },
+                    child: const Text(
+                      'dismiss',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  )
+                ],
+                contentTextStyle: const TextStyle(color: Colors.white),
+                padding: const EdgeInsets.all(10),
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            TextFormField(
+              controller: emailController,
+              decoration: const InputDecoration(
+                hintText: 'Email',
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) =>
+                  value != null && value.isNotEmpty ? null : 'Required',
             ),
+            const SizedBox(height: 20),
+            TextFormField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                hintText: 'Password',
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) =>
+                  value != null && value.isNotEmpty ? null : 'Required',
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: isLoading ? null : _emailAndPassword,
+                child: isLoading
+                    ? const CircularProgressIndicator.adaptive()
+                    : const Text('email password'),
+              ),
+            ),
+            Row(
+              children: [
+                const Text('Already have an Account?'),
+                TextButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: ((context) => SignUpPage(auth: _auth))),
+                  ),
+                  child: const Text('sign up'),
+                )
+              ],
+            )
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  Future<void> _emailAndPassword() async {
+    if (formKey.currentState?.validate() ?? false) {
+      setIsLoading();
+
+      try {
+        await _auth.signInWithEmailAndPassword(
+          email: emailController.text,
+          password: passwordController.text,
+        );
+      } on FirebaseAuthException catch (e) {
+        setState(() {
+          error = '${e.message}';
+        });
+      } catch (e) {
+        setState(() {
+          error = '$e';
+        });
+      } finally {
+        setIsLoading();
+      }
+    }
+  }
+}
+
+class SignUpPage extends StatefulWidget {
+  final dynamic auth;
+  const SignUpPage({
+    Key? key,
+    required this.auth,
+  }) : super(key: key);
+
+  @override
+  State<SignUpPage> createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  String error = '';
+  String verificationId = '';
+  bool isLoading = false;
+
+  void setIsLoading() {
+    setState(() {
+      isLoading = !isLoading;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: formKey,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Visibility(
+              visible: error.isNotEmpty,
+              child: MaterialBanner(
+                backgroundColor: Theme.of(context).errorColor,
+                content: Text(error),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        error = '';
+                      });
+                    },
+                    child: const Text(
+                      'dismiss',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  )
+                ],
+                contentTextStyle: const TextStyle(color: Colors.white),
+                padding: const EdgeInsets.all(10),
+              ),
+            ),
+            TextFormField(
+              controller: emailController,
+              decoration: const InputDecoration(
+                hintText: 'Email',
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) =>
+                  value != null && value.isNotEmpty ? null : 'Required',
+            ),
+            const SizedBox(height: 20),
+            TextFormField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                hintText: 'Password',
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) =>
+                  value != null && value.isNotEmpty ? null : 'Required',
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: isLoading ? null : _emailAndPassword,
+                child: isLoading
+                    ? const CircularProgressIndicator.adaptive()
+                    : const Text('email password'),
+              ),
+            ),
+            Row(
+              children: [
+                const Text('Already have an Account?'),
+                TextButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: ((context) => SignUpPage(auth: _auth))),
+                  ),
+                  child: const Text('sign up'),
+                )
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _emailAndPassword() async {
+    if (formKey.currentState?.validate() ?? false) {
+      setIsLoading();
+      try {
+        await _auth.createUserWithEmailAndPassword(
+          email: emailController.text,
+          password: passwordController.text,
+        );
+      } on FirebaseAuthException catch (e) {
+        setState(() {
+          error = '${e.message}';
+        });
+      } catch (e) {
+        setState(() {
+          error = '$e';
+        });
+      } finally {
+        setIsLoading();
+      }
+    }
+  }
+}
+
+class HomePage extends StatelessWidget {
+  final dynamic auth;
+  const HomePage({
+    Key? key,
+    required this.auth,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Text('Welcome ' + auth.currentUser!.email + 'to home page'),
+          IconButton(
+            onPressed: () {
+              auth.signOut();
+            },
+            icon: const Icon(Icons.logout),
+          )
+        ],
+      ),
     );
   }
 }
