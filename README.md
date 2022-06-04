@@ -45,8 +45,7 @@ Karena pada repo ini menggunkan teknologi dari firebase, maka Anda perlu mengkon
 ![image](https://user-images.githubusercontent.com/52303525/171988126-68400c41-1d8d-4a92-b743-a1b654ab61f4.png)
 
 
-2. Download file `google-services.json`.
-![](images/3.png)
+2. Download file `google-services.json`. Dan pindahkan ke folder android/app
 
 3. Tambahkan "classpath 'com.google.gms:google-services:4.3.10'" pada android/build.gradle pada project flutter
 ![image](https://user-images.githubusercontent.com/52303525/171988216-1a328ac3-2ee0-45db-b47f-16b5b865d6f8.png)
