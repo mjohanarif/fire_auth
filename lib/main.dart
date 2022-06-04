@@ -35,50 +35,52 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Firebase Example App',
       theme: ThemeData(primarySwatch: Colors.amber),
-      home: Scaffold(
-        body: LayoutBuilder(
-          builder: (context, constraines) {
-            return Row(
-              children: [
-                Visibility(
-                  visible: constraines.maxWidth >= 1200,
-                  child: Expanded(
-                    child: Container(
-                      height: double.infinity,
-                      color: Theme.of(context).colorScheme.primary,
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Firebase Auth Desktop',
-                              style: Theme.of(context).textTheme.headline4,
-                            ),
-                          ],
+      home: SafeArea(
+        child: Scaffold(
+          body: LayoutBuilder(
+            builder: (context, constraines) {
+              return Row(
+                children: [
+                  Visibility(
+                    visible: constraines.maxWidth >= 1200,
+                    child: Expanded(
+                      child: Container(
+                        height: double.infinity,
+                        color: Theme.of(context).colorScheme.primary,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Firebase Auth Desktop',
+                                style: Theme.of(context).textTheme.headline4,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  width: constraines.maxWidth >= 1200
-                      ? constraines.maxWidth / 2
-                      : constraines.maxWidth,
-                  child: StreamBuilder<User?>(
-                    stream: FirebaseAuth.instance.authStateChanges(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return HomePage(
-                          auth: FirebaseAuth.instance,
-                        );
-                      }
-                      return const LoginPage();
-                    },
+                  SizedBox(
+                    width: constraines.maxWidth >= 1200
+                        ? constraines.maxWidth / 2
+                        : constraines.maxWidth,
+                    child: StreamBuilder<User?>(
+                      stream: FirebaseAuth.instance.authStateChanges(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return HomePage(
+                            auth: FirebaseAuth.instance,
+                          );
+                        }
+                        return const LoginPage();
+                      },
+                    ),
                   ),
-                ),
-              ],
-            );
-          },
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -97,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
-
+  TextEditingController nameController = TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   String error = '';
   String verificationId = '';
@@ -111,80 +113,107 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: formKey,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Visibility(
-              visible: error.isNotEmpty,
-              child: MaterialBanner(
-                backgroundColor: Theme.of(context).errorColor,
-                content: Text(error),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        error = '';
-                      });
-                    },
-                    child: const Text(
-                      'dismiss',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  )
-                ],
-                contentTextStyle: const TextStyle(color: Colors.white),
-                padding: const EdgeInsets.all(10),
-              ),
-            ),
-            TextFormField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                hintText: 'Email',
-                border: OutlineInputBorder(),
-              ),
-              validator: (value) =>
-                  value != null && value.isNotEmpty ? null : 'Required',
-            ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                hintText: 'Password',
-                border: OutlineInputBorder(),
-              ),
-              validator: (value) =>
-                  value != null && value.isNotEmpty ? null : 'Required',
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: isLoading ? null : _emailAndPassword,
-                child: isLoading
-                    ? const CircularProgressIndicator.adaptive()
-                    : const Text('email password'),
-              ),
-            ),
-            Row(
+    return Scaffold(
+      body: SafeArea(
+        child: Form(
+          key: formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
               children: [
-                const Text('Already have an Account?'),
-                TextButton(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: ((context) => SignUpPage(auth: _auth))),
+                Visibility(
+                  visible: error.isNotEmpty,
+                  child: MaterialBanner(
+                    backgroundColor: Theme.of(context).errorColor,
+                    content: Text(error),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            error = '';
+                          });
+                        },
+                        child: const Text(
+                          'dismiss',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      )
+                    ],
+                    contentTextStyle: const TextStyle(color: Colors.white),
+                    padding: const EdgeInsets.all(10),
                   ),
-                  child: const Text('sign up'),
-                )
+                ),
+                const Spacer(),
+                Image.network(
+                    'https://shefamarketing.com/wp-content/uploads/2021/06/outstanding-social-media-campaigns-5f60d3e4bb13b.png'),
+                const Spacer(),
+
+                TextFormField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    hintText: 'Username',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) =>
+                      value != null && value.isNotEmpty ? null : 'Required',
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: emailController,
+                  decoration: const InputDecoration(
+                    hintText: 'Email',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) =>
+                      value != null && value.isNotEmpty ? null : 'Required',
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    hintText: 'Password',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) =>
+                      value != null && value.isNotEmpty ? null : 'Required',
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: isLoading ? null : _emailAndPassword,
+                    style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.blue)),
+                    child: isLoading
+                        ? const CircularProgressIndicator.adaptive()
+                        : const Text(
+                            'Sign up',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                  ),
+                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   children: [
+                //     const Text('Doesn\'t have an Account?'),
+                //     TextButton(
+                //       onPressed: () => Navigator.push(
+                //         context,
+                //         MaterialPageRoute(
+                //             builder: ((context) =>
+                //                 SignUpPage(auth: FirebaseAuth.instance))),
+                //       ),
+                //       child: const Text('sign up'),
+                //     )
+                //   ],
+                // )
               ],
-            )
-          ],
+            ),
+          ),
         ),
       ),
     );
@@ -195,10 +224,12 @@ class _LoginPageState extends State<LoginPage> {
       setIsLoading();
 
       try {
-        await _auth.signInWithEmailAndPassword(
+        UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: emailController.text,
           password: passwordController.text,
         );
+        User user = result.user!;
+        user.updateDisplayName(nameController.text);
       } on FirebaseAuthException catch (e) {
         setState(() {
           error = '${e.message}';
@@ -214,137 +245,148 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-class SignUpPage extends StatefulWidget {
-  final dynamic auth;
-  const SignUpPage({
-    Key? key,
-    required this.auth,
-  }) : super(key: key);
+// class SignUpPage extends StatefulWidget {
+//   final dynamic auth;
+//   const SignUpPage({
+//     Key? key,
+//     required this.auth,
+//   }) : super(key: key);
 
-  @override
-  State<SignUpPage> createState() => _SignUpPageState();
-}
+//   @override
+//   State<SignUpPage> createState() => _SignUpPageState();
+// }
 
-class _SignUpPageState extends State<SignUpPage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
+// class _SignUpPageState extends State<SignUpPage> {
+//   TextEditingController emailController = TextEditingController();
+//   TextEditingController passwordController = TextEditingController();
+//   TextEditingController phoneController = TextEditingController();
+//   TextEditingController nameController = TextEditingController();
 
-  GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  String error = '';
-  String verificationId = '';
-  bool isLoading = false;
+//   GlobalKey<FormState> formKey = GlobalKey<FormState>();
+//   String error = '';
+//   String verificationId = '';
+//   bool isLoading = false;
 
-  void setIsLoading() {
-    setState(() {
-      isLoading = !isLoading;
-    });
-  }
+//   void setIsLoading() {
+//     setState(() {
+//       isLoading = !isLoading;
+//     });
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: formKey,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Visibility(
-              visible: error.isNotEmpty,
-              child: MaterialBanner(
-                backgroundColor: Theme.of(context).errorColor,
-                content: Text(error),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        error = '';
-                      });
-                    },
-                    child: const Text(
-                      'dismiss',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  )
-                ],
-                contentTextStyle: const TextStyle(color: Colors.white),
-                padding: const EdgeInsets.all(10),
-              ),
-            ),
-            TextFormField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                hintText: 'Email',
-                border: OutlineInputBorder(),
-              ),
-              validator: (value) =>
-                  value != null && value.isNotEmpty ? null : 'Required',
-            ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                hintText: 'Password',
-                border: OutlineInputBorder(),
-              ),
-              validator: (value) =>
-                  value != null && value.isNotEmpty ? null : 'Required',
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: isLoading ? null : _emailAndPassword,
-                child: isLoading
-                    ? const CircularProgressIndicator.adaptive()
-                    : const Text('email password'),
-              ),
-            ),
-            Row(
-              children: [
-                const Text('Already have an Account?'),
-                TextButton(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: ((context) => SignUpPage(auth: _auth))),
-                  ),
-                  child: const Text('sign up'),
-                )
-              ],
-            )
-          ],
-        ),
-      ),
-    );
-  }
+//   @override
+//   Widget build(BuildContext context) {
+//     return SafeArea(
+//       child: Scaffold(
+//         body: Form(
+//           key: formKey,
+//           autovalidateMode: AutovalidateMode.onUserInteraction,
+//           child: Padding(
+//             padding: const EdgeInsets.all(8.0),
+//             child: ListView(
+//               children: [
+//                 Visibility(
+//                   visible: error.isNotEmpty,
+//                   child: MaterialBanner(
+//                     backgroundColor: Theme.of(context).errorColor,
+//                     content: Text(error),
+//                     actions: [
+//                       TextButton(
+//                         onPressed: () {
+//                           setState(() {
+//                             error = '';
+//                           });
+//                         },
+//                         child: const Text(
+//                           'dismiss',
+//                           style: TextStyle(color: Colors.white),
+//                         ),
+//                       )
+//                     ],
+//                     contentTextStyle: const TextStyle(color: Colors.white),
+//                     padding: const EdgeInsets.all(10),
+//                   ),
+//                 ),
+//                 TextFormField(
+//                   controller: nameController,
+//                   decoration: const InputDecoration(
+//                     hintText: 'Username',
+//                     border: OutlineInputBorder(),
+//                   ),
+//                   validator: (value) =>
+//                       value != null && value.isNotEmpty ? null : 'Required',
+//                 ),
+//                 const SizedBox(height: 20),
+//                 TextFormField(
+//                   controller: emailController,
+//                   decoration: const InputDecoration(
+//                     hintText: 'Email',
+//                     border: OutlineInputBorder(),
+//                   ),
+//                   validator: (value) =>
+//                       value != null && value.isNotEmpty ? null : 'Required',
+//                 ),
+//                 const SizedBox(height: 20),
+//                 TextFormField(
+//                   controller: passwordController,
+//                   obscureText: true,
+//                   decoration: const InputDecoration(
+//                     hintText: 'Password',
+//                     border: OutlineInputBorder(),
+//                   ),
+//                   validator: (value) =>
+//                       value != null && value.isNotEmpty ? null : 'Required',
+//                 ),
+//                 const SizedBox(height: 20),
+//                 SizedBox(
+//                   width: double.infinity,
+//                   height: 50,
+//                   child: ElevatedButton(
+//                     onPressed: isLoading ? null : _emailAndPassword,
+//                     child: isLoading
+//                         ? const CircularProgressIndicator.adaptive()
+//                         : const Text('email password'),
+//                   ),
+//                 ),
+//                 Row(
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   children: [
+//                     const Text('Already have an Account?'),
+//                     TextButton(
+//                       onPressed: () => Navigator.pop(context),
+//                       child: const Text('Login'),
+//                     )
+//                   ],
+//                 )
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
 
-  Future<void> _emailAndPassword() async {
-    if (formKey.currentState?.validate() ?? false) {
-      setIsLoading();
-      try {
-        await _auth.createUserWithEmailAndPassword(
-          email: emailController.text,
-          password: passwordController.text,
-        );
-      } on FirebaseAuthException catch (e) {
-        setState(() {
-          error = '${e.message}';
-        });
-      } catch (e) {
-        setState(() {
-          error = '$e';
-        });
-      } finally {
-        setIsLoading();
-      }
-    }
-  }
-}
+//   Future<void> _emailAndPassword() async {
+//     if (formKey.currentState?.validate() ?? false) {
+//       setIsLoading();
+//       try {
+//         await FirebaseAuth.instance.signInWithEmailAndPassword(
+//           email: emailController.text,
+//           password: passwordController.text,
+//         );
+//       } on FirebaseAuthException catch (e) {
+//         setState(() {
+//           error = '${e.message}';
+//         });
+//       } catch (e) {
+//         setState(() {
+//           error = '$e';
+//         });
+//       } finally {
+//         setIsLoading();
+//       }
+//     }
+//   }
+// }
 
 class HomePage extends StatelessWidget {
   final dynamic auth;
@@ -359,7 +401,7 @@ class HomePage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Text('Welcome ' + auth.currentUser!.email + 'to home page'),
+          Text('Welcome ' + auth.currentUser!.displayName + ' to home page'),
           IconButton(
             onPressed: () {
               auth.signOut();
