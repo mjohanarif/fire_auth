@@ -57,7 +57,12 @@ Karena pada repo ini menggunkan teknologi dari firebase, maka Anda perlu mengkon
 
 **Step 4:**
 
-Tambakan kode berikut pada file `lib/main.dart`:
+Tambakan dependencies berikut pada pubspec.yaml 
+```
+  firebase_auth: ^3.3.19
+  firebase_core: ^1.17.1
+```
+ kode berikut pada file `lib/main.dart`:
 ```dart
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
