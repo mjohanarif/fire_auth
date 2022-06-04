@@ -64,6 +64,7 @@ Tambakan dependencies berikut pada pubspec.yaml
 ```
  kode berikut pada file `lib/main.dart`:
 ```dart
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -74,36 +75,21 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (!kIsWeb) {
     await Firebase.initializeApp();
-  } else {
-    await Firebase.initializeApp(
-      options: const FirebaseOptions(
-        apiKey: 'ISI SESUAI API KEY KONFIGURASI WEB',
-        appId: 'ISI SESUAI APP ID KONFIGURASI WEB',
-        messagingSenderId: 'ISI SESUAI messagingSenderId KONFIGURASI WEB',
-        projectId: 'ISI SESUAI projectId KONFIGURASI WEB',
-        authDomain: 'ISI SESUAI authDomain KONFIGURASI WEB',
-        storageBucket: 'ISI SESUAI storageBucket KONFIGURASI WEB',
-      ),
-    );
   }
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Firebase Example App',
-      theme: ThemeData(primarySwatch: Colors.amber),
+      theme: ThemeData(primarySwatch: Colors.teal),
       home: SafeArea(
         child: Scaffold(
+          appBar: AppBar(title: const Text('Firebase Auth')),
           body: LayoutBuilder(
             builder: (context, constraines) {
               return Row(
@@ -176,11 +162,8 @@ class _LoginPageState extends State<LoginPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
-  TextEditingController nameController = TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   String error = '';
-  String verificationId = '';
   bool isLoading = false;
 
   void setIsLoading() {
@@ -224,7 +207,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const Spacer(),
                 const Text(
-                  'Social Media',
+                  'The Social Media',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
@@ -253,7 +236,7 @@ class _LoginPageState extends State<LoginPage> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: isLoading ? null : _emailAndPassword,
+                    onPressed: isLoading ? null : _signupemailAndPassword,
                     child: isLoading
                         ? const CircularProgressIndicator.adaptive()
                         : const Text(
@@ -270,7 +253,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<void> _emailAndPassword() async {
+  Future<void> _signupemailAndPassword() async {
     if (formKey.currentState?.validate() ?? false) {
       setIsLoading();
       try {
