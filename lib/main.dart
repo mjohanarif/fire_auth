@@ -8,36 +8,21 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (!kIsWeb) {
     await Firebase.initializeApp();
-  } else {
-    await Firebase.initializeApp(
-      options: const FirebaseOptions(
-        apiKey: 'AIzaSyAP42iiGg0sZoE6dDuUgeXW0aHoAVWhNBg',
-        appId: 'fireauth-4865c.firebaseapp.com',
-        messagingSenderId: '355468251515',
-        projectId: 'fireauth-4865c',
-        authDomain: 'fireauth-4865c.firebaseapp.com',
-        storageBucket: 'fireauth-4865c.appspot.com',
-      ),
-    );
   }
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Firebase Example App',
-      theme: ThemeData(primarySwatch: Colors.amber),
+      theme: ThemeData(primarySwatch: Colors.teal),
       home: SafeArea(
         child: Scaffold(
+          appBar: AppBar(title: const Text('Firebase Auth')),
           body: LayoutBuilder(
             builder: (context, constraines) {
               return Row(

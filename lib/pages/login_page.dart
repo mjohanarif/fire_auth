@@ -12,11 +12,8 @@ class _LoginPageState extends State<LoginPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
-  TextEditingController nameController = TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   String error = '';
-  String verificationId = '';
   bool isLoading = false;
 
   void setIsLoading() {
@@ -60,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const Spacer(),
                 const Text(
-                  'Social Media',
+                  'The Social Media',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
@@ -89,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: isLoading ? null : _emailAndPassword,
+                    onPressed: isLoading ? null : _signupemailAndPassword,
                     child: isLoading
                         ? const CircularProgressIndicator.adaptive()
                         : const Text(
@@ -106,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<void> _emailAndPassword() async {
+  Future<void> _signupemailAndPassword() async {
     if (formKey.currentState?.validate() ?? false) {
       setIsLoading();
       try {
